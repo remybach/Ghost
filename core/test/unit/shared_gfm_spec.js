@@ -4,7 +4,7 @@
  */
 
 /*globals describe, it */
-var testUtils = require('./testUtils'),
+var testUtils = require('../utils'),
     should = require('should'),
 
     // Stuff we are testing
@@ -28,15 +28,16 @@ function _ConvertPhrase(testPhrase) {
 
 
 describe("Github showdown extensions", function () {
+    /*jslint regexp: true */
 
     it("should export an array of methods for processing", function () {
-        github.should.be.a("function");
-        github().should.be.an.instanceof(Array);
+        github.should.be.a.function;
+        github().should.be.an.Array;
 
         github().forEach(function (processor) {
-            processor.should.be.a("object");
+            processor.should.be.an.Object;
             processor.should.have.property("type");
-            processor.type.should.be.a("string");
+            processor.type.should.be.a.String;
         });
 
     });

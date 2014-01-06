@@ -77,14 +77,35 @@
             'published': 'Update Post'
         },
 
-        notificationMap: {
-            'draft': 'Your post has been saved as a draft.',
-            'published': 'Your post has been published.'
-        },
+        //TODO: This has to be moved to the I18n localization file.
+        //This structure is supposed to be close to the i18n-localization which will be used soon. 
+        messageMap: {
+            errors: {
+                post: {
+                    published: {
+                        'published': 'Your post could not be updated.',
+                        'draft': 'Your post could not be saved as a draft.'
+                    },
+                    draft: {
+                        'published': 'Your post could not be published.',
+                        'draft': 'Your post could not be saved as a draft.'
+                    }
 
-        errorMap: {
-            'draft': 'Your post could not be saved as a draft.',
-            'published': 'Your post could not be published.'
+                }
+            },
+
+            success: {
+                post: {
+                    published: {
+                        'published': 'Your post has been updated.',
+                        'draft': 'Your post has been saved as a draft.'
+                    },
+                    draft: {
+                        'published': 'Your post has been published.',
+                        'draft': 'Your post has been saved as a draft.'
+                    }
+                }
+            }
         },
 
         initialize: function () {
@@ -100,9 +121,6 @@
                 self.updatePost();
             });
             this.listenTo(this.model, 'change:status', this.render);
-            this.listenTo(this.model, 'change:id', function (m) {
-                Backbone.history.navigate('/editor/' + m.id + '/');
-            });
         },
 
         toggleStatus: function () {
@@ -122,10 +140,10 @@
             this.savePost({
                 status: keys[newIndex]
             }).then(function () {
-                self.reportSaveSuccess(status);
+                self.reportSaveSuccess(status, prevStatus);
             }, function (xhr) {
                 // Show a notification about the error
-                self.reportSaveError(xhr, model, status);
+                self.reportSaveError(xhr, model, status, prevStatus);
             });
         },
 
@@ -188,7 +206,7 @@
             this.savePost({
                 status: status
             }).then(function () {
-                self.reportSaveSuccess(status);
+                self.reportSaveSuccess(status, prevStatus);
                 // Refresh publish button and all relevant controls with updated status.
                 self.render();
             }, function (xhr) {
@@ -197,7 +215,7 @@
                 // Set appropriate button status
                 self.setActiveStatus(status, self.statusMap[status], prevStatus);
                 // Show a notification about the error
-                self.reportSaveError(xhr, model, status);
+                self.reportSaveError(xhr, model, status, prevStatus);
             });
         },
 
@@ -220,17 +238,18 @@
             return $.Deferred().reject();
         },
 
-        reportSaveSuccess: function (status) {
+        reportSaveSuccess: function (status, prevStatus) {
             Ghost.notifications.clearEverything();
             Ghost.notifications.addItem({
                 type: 'success',
-                message: this.notificationMap[status],
+                message: this.messageMap.success.post[prevStatus][status],
                 status: 'passive'
             });
+            Ghost.currentView.setEditorDirty(false);
         },
 
-        reportSaveError: function (response, model, status) {
-            var message = this.errorMap[status];
+        reportSaveError: function (response, model, status, prevStatus) {
+            var message = this.messageMap.errors.post[prevStatus][status];
 
             if (response) {
                 // Get message from response
@@ -278,6 +297,7 @@
     Ghost.Views.Editor = Ghost.View.extend({
 
         initialize: function () {
+            var self = this;
 
             // Add the container view for the Publish Bar
             this.addSubview(new PublishBar({el: "#publish-bar", model: this.model})).render();
@@ -286,6 +306,13 @@
             this.$('#entry-markdown').text(this.model.get('markdown'));
 
             this.listenTo(this.model, 'change:title', this.renderTitle);
+            this.listenTo(this.model, 'change:id', function (m) {
+                // This is a special case for browsers which fire an unload event when using navigate. The id change
+                // happens before the save success and can cause the unload alert to appear incorrectly on first save
+                // The id only changes in the event that the save has been successful, so this workaround is safes
+                self.setEditorDirty(false);
+                Backbone.history.navigate('/editor/' + m.id + '/');
+            });
 
             this.initMarkdown();
             this.renderPreview();
@@ -316,6 +343,10 @@
                 $(e.target).closest('section').addClass('active');
             });
 
+            // Deactivate default drag/drop action
+            $(document).bind('drop dragover', function (e) {
+                e.preventDefault();
+            });
         },
 
         events: {
@@ -410,7 +441,11 @@
                 tabMode: 'indent',
                 tabindex: "2",
                 lineWrapping: true,
-                dragDrop: false
+                dragDrop: false,
+                extraKeys: {
+                    Home: "goLineLeft",
+                    End: "goLineRight"
+                }
             });
             this.uploadMgr = new UploadManager(this.editor);
 
@@ -439,6 +474,18 @@
             return this.uploadMgr.getEditorValue();
         },
 
+        unloadDirtyMessage: function () {
+            return "==============================\n\n" +
+                "Hey there! It looks like you're in the middle of writing" +
+                " something and you haven't saved all of your content." +
+                "\n\nSave before you go!\n\n" +
+                "==============================";
+        },
+
+        setEditorDirty: function (dirty) {
+            window.onbeforeunload = dirty ? this.unloadDirtyMessage : null;
+        },
+
         initUploads: function () {
             var filestorage = $('#entry-markdown-content').data('filestorage');
             this.$('.js-drop-zone').upload({editor: true, fileStorage: filestorage});
@@ -452,6 +499,7 @@
             var self = this;
             this.editor.setOption("readOnly", false);
             this.editor.on('change', function () {
+                self.setEditorDirty(true);
                 self.renderPreview();
             });
         },
@@ -642,11 +690,13 @@
             var value = editor.getValue();
 
             _.each(markerMgr.markers, function (marker, id) {
+                /*jslint unparam:true*/
                 value = value.replace(markerMgr.getMarkerRegexForId(id), '');
             });
 
             return value;
         }
+
 
         // Public API
         _.extend(this, {
@@ -656,6 +706,7 @@
 
         // initialise
         editor.on('change', function (cm, changeObj) {
+            /*jslint unparam:true*/
             var linesChanged = _.range(changeObj.from.line, changeObj.from.line + changeObj.text.length);
 
             _.each(linesChanged, function (ln) {

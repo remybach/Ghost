@@ -1,6 +1,6 @@
 var Settings,
-    GhostBookshelf = require('./base'),
-    validator      = GhostBookshelf.validator,
+    ghostBookshelf = require('./base'),
+    validator      = ghostBookshelf.validator,
     uuid           = require('node-uuid'),
     _              = require('underscore'),
     errors         = require('../errorHandling'),
@@ -29,7 +29,7 @@ defaultSettings = parseDefaultSettings();
 
 // Each setting is saved as a separate row in the database,
 // but the overlying API treats them as a single key:value mapping
-Settings = GhostBookshelf.Model.extend({
+Settings = ghostBookshelf.Model.extend({
 
     tableName: 'settings',
 
@@ -83,7 +83,7 @@ Settings = GhostBookshelf.Model.extend({
             this.set('value', this.sanitize('value'));
         }
 
-        return GhostBookshelf.Model.prototype.saving.apply(this, arguments);
+        return ghostBookshelf.Model.prototype.saving.apply(this, arguments);
     }
 
 }, {
@@ -92,10 +92,10 @@ Settings = GhostBookshelf.Model.extend({
         if (!_.isObject(_key)) {
             _key = { key: _key };
         }
-        return GhostBookshelf.Model.read.call(this, _key);
+        return ghostBookshelf.Model.read.call(this, _key);
     },
 
-    edit: function (_data) {
+    edit: function (_data, t) {
         var settings = this;
         if (!Array.isArray(_data)) {
             _data = [_data];
@@ -103,11 +103,12 @@ Settings = GhostBookshelf.Model.extend({
         return when.map(_data, function (item) {
             // Accept an array of models as input
             if (item.toJSON) { item = item.toJSON(); }
-            return settings.forge({ key: item.key }).fetch().then(function (setting) {
+            return settings.forge({ key: item.key }).fetch({transacting: t}).then(function (setting) {
+
                 if (setting) {
-                    return setting.set('value', item.value).save();
+                    return setting.set('value', item.value).save(null, {transacting: t});
                 }
-                return settings.forge({ key: item.key, value: item.value }).save();
+                return settings.forge({ key: item.key, value: item.value }).save(null, {transacting: t});
 
             }, errors.logAndThrowError);
         });

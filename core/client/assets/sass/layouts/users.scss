@@ -146,6 +146,7 @@
         line-height: 0;
         width: 100%;
         height: auto;
+        min-height: 180px;
     }
 
     .edit-cover-image {
@@ -190,7 +191,7 @@
 
     .user-image {
         @include box-sizing(border-box);
-        display: table;
+        display: block;
         position: relative;
         width: 120px;
         height: 120px;
@@ -206,11 +207,11 @@
 
         .img {
             display: block;
-            width: 100%;
-            height: 100%;
-            background-image: url(/shared/img/user-image.png);
+            width: 110px;
+            height: 110px;
             background-size: cover;
             background-position: center center;
+            border-radius: 100%;
         }
 
         &:hover {
@@ -221,15 +222,14 @@
     }
 
     .edit-user-image {
-        position: absolute;
-        top: 0;
-        width: 100%;
-        height: 100%;
-        display: block;
+        @include position(absolute, 0px 0px 0px 0px);
         border-radius: 100%;
         background: rgba(0,0,0,0.5);
         opacity: 0;
         color: #fff;
+        line-height: 105px;
+        text-transform: uppercase;
+        text-decoration: none;
         @include transition(opacity 0.3s ease);
     }
 

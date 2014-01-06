@@ -1,5 +1,5 @@
 /*globals describe, before, beforeEach, afterEach, it*/
-var testUtils = require('./testUtils'),
+var testUtils = require('../utils'),
     should = require('should'),
     sinon = require('sinon'),
     when = require('when'),
@@ -22,7 +22,6 @@ describe("Exporter", function () {
     });
 
     beforeEach(function (done) {
-        this.timeout(5000);
         testUtils.initData().then(function () {
             done();
         }, done);
@@ -37,7 +36,7 @@ describe("Exporter", function () {
     it("exports data", function (done) {
         // Stub migrations to return 000 as the current database version
         var migrationStub = sinon.stub(migration, "getDatabaseVersion", function () {
-            return when.resolve("000");
+            return when.resolve("001");
         });
 
         exporter().then(function (exportData) {
@@ -49,8 +48,8 @@ describe("Exporter", function () {
             should.exist(exportData.meta);
             should.exist(exportData.data);
 
-            exportData.meta.version.should.equal("000");
-            _.findWhere(exportData.data.settings, {key: "databaseVersion"}).value.should.equal("000");
+            exportData.meta.version.should.equal("001");
+            _.findWhere(exportData.data.settings, {key: "databaseVersion"}).value.should.equal("001");
 
             _.each(tables, function (name) {
                 should.exist(exportData.data[name]);

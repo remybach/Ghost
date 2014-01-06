@@ -1,4 +1,4 @@
-/*globals casper, __utils__, url, user, falseUser */
+/*globals casper, __utils__, url, newUser, user, falseUser */
 
 CasperTest.begin('Ensure Session is Killed', 1, function suite(test) {
     casper.thenOpen(url + 'logout/', function (response) {
@@ -45,7 +45,7 @@ CasperTest.begin('Redirects login to signin', 2, function suite(test) {
     });
 }, true);
 
-CasperTest.begin("Can't spam it", 4, function suite(test) {
+CasperTest.begin("Can't spam it", 3, function suite(test) {
     casper.thenOpen(url + "ghost/signin/", function testTitle() {
         test.assertTitle("Ghost Admin", "Ghost admin has no title");
     });
@@ -62,17 +62,45 @@ CasperTest.begin("Can't spam it", 4, function suite(test) {
         this.fill("#login", falseUser, true);
     });
 
-    casper.waitForSelector('.notification-error', function onSuccess() {
-        test.assert(true, 'Save without title results in error notification as expected');
+    casper.waitForText('Slow down, there are way too many login attempts!', function onSuccess() {
+        test.assert(true, 'Spamming the login did result in an error notification');
         test.assertSelectorDoesntHaveText('.notification-error', '[object Object]');
-        test.assertSelectorHasText('.notification-error', 'Slow down, there are way too many login attempts!');
     }, function onTimeout() {
         test.assert(false, 'Spamming the login did not result in an error notification');
     });
 
     // This test causes the spam notification
     // add a wait to ensure future tests don't get tripped up by this.
-    casper.wait(1000);
+    casper.wait(2000);
+}, true);
+
+
+CasperTest.begin("Login limit is in place", 3, function suite(test) {
+    casper.thenOpen(url + "ghost/signin/", function testTitle() {
+        test.assertTitle("Ghost Admin", "Ghost admin has no title");
+    });
+
+    casper.waitForOpaque(".login-box",
+        function then() {
+            this.fill("#login", falseUser, true);
+        },
+        function onTimeout() {
+            test.fail('Sign in form didn\'t fade in.');
+        });
+
+    casper.wait(2100, function doneWait() {
+        this.fill("#login", falseUser, true);
+    });
+
+    casper.waitForText('remaining', function onSuccess() {
+        test.assert(true, 'The login limit is in place.');
+        test.assertSelectorDoesntHaveText('.notification-error', '[object Object]');
+    }, function onTimeout() {
+        test.assert(false, 'We did not trip the login limit.');
+    });
+    // This test used login, add a wait to 
+    // ensure future tests don't get tripped up by this.
+    casper.wait(2000);
 }, true);
 
 CasperTest.begin("Can login to Ghost", 4, function suite(test) {

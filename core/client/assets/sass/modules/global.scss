@@ -60,6 +60,7 @@
 .clearfix:after { clear: both; }
 .clearfix { *zoom: 1; }
 
+
 /* ==========================================================================
    Global Styles
    ========================================================================== */
@@ -216,7 +217,7 @@ blockquote {
 
     small {
         display: inline-block;
-        margin: 0.8em 0 0.8em 1.5em;;
+        margin: 0.8em 0 0.8em 1.5em;
         font-size:0.9em;
         color: $brown;
 
@@ -257,7 +258,7 @@ mark {
 code, tt {
     font-family: $font-family-mono;
     font-size: 0.85em;
-    white-space: pre;
+    white-space: pre-wrap;
     background: lighten($lightbrown, 2%);
     border: 1px solid darken($lightbrown, 8%);
     border-radius: 2px;
@@ -317,7 +318,7 @@ table {
         padding: 8px;
         line-height: 20px;
         text-align: left;
-        vertical-align: top;
+        vertical-align: middle;
         border-top: 1px solid $lightbrown;
     }
 
@@ -347,7 +348,6 @@ table {
             background: transparent;
         }
     }
-
 }
 
 // General Navigation
@@ -360,8 +360,7 @@ nav {
         border-top:$lightbrown 1px solid;
     }
 
-    li { font-size:1.1em;
-
+    li { 
         a {
             display:block;
             padding:10px 15px;
@@ -835,61 +834,110 @@ nav {
    Post Settings
    ========================================================================== */
 
-.post-setting {
-    min-width: 260px;
-    border-bottom: 1px solid #35393b;
+.post-settings {
+    @include icon($i-settings, 14px);
+    @include box-sizing(border-box);
+    display: inline-block;
+    padding: 0 10px;
+    color: $midgrey;
+    @include transition;
+    position: relative;
+    top: 1px;
 
-    &:first-child {
-        margin-top: -6px;
+    &:hover,
+    &.active {
+        color: $darkgrey;
+    }
+}
+
+.post-settings-menu {
+    padding-top: 0;
+    text-transform: none;
+
+    table {
+        margin: 0;
+    }
+
+    td {
+        padding: 0;
+        border-top: none;
+        border-bottom: lighten($grey, 5%) 1px solid;
+    }
+
+    .post-setting-label {
+        padding: 8px 10px 8px 15px;
+        border-right: lighten($grey, 5%) 1px solid;
+        text-align: right;
+    }
+
+    %label {
+        position: static;
+        width: auto;
+        font-weight: normal;
+        color: $midgrey;
+        white-space: nowrap;
     }
 
     input {
-        width: 100%;
-        background: none;
-        border: none;
-        color: #e2edf2;
-        line-height: 1.68em;
+        width: 200px;
+        margin: 0;
+
+        @include breakpoint(550px) { width: 200px; }
+
+        &[type="text"] {
+            border: none;
+            padding: 8px 0 8px 10px;
+            color: $lightgrey;
+            border-radius: 0;
+            background: transparent;
+
+            &:focus {
+                background: $grey;
+                border: none;
+            }
+        }
+    }
+
+    .post-setting-item {
+        position: relative;
+        padding: 7px;
+    }
+
+    .checkbox {
+        @include position(absolute, 9px 0 0 10px);
+        margin-top: 0;
+        width: 18px;
+        border: lighten($grey, 10%) 1px solid;
+        background: $grey;
+    }
+
+    .delete {
+        display: block;
+        padding: 10px 15px;
+        @include icon($i-trash) { 
+            position: relative; 
+            top: -1px; 
+            margin-right: 10px 
+        };
+
+        &:hover { background: $red; }
     }
 }
 
-.post-setting-label {
-    float: left;
-    width: 26%;
-    text-align: right;
-    padding: 10px 2%;
-    border-right: 1px solid #35393b;
-}
-
-.post-setting-field {
-    float: left;
-    width: 64%;
-    padding: 8px 2%;
-
-    input:focus {
-        outline: none;
-    }
-}
-
-.post-settings {
-    @include icon($i-settings, 14px);
-    padding: 5px;
-    /* margin-right: -5px;*/
-}
-
-.post-setting-calendar {
-    @include icon-after($i-calendar, 18px);
-    width: 18px;
-    height: 18px;
-    position: absolute;
-    margin-top: -25px; /* This doesn't work in FF */
-    right: 10px;
-}
 
 /* ==========================================================================
    Notifications
    ========================================================================== */
 
 #notifications {
+    @include breakpoint($biggerthan-mobile) {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        z-index: 980;
+        width: 300px;
+    }
+
     @include breakpoint($mobile) {
         position: fixed;
         top: 0;
@@ -904,17 +952,6 @@ nav {
 }
 
 %notification, .notification {
-    @include box-sizing(border-box);
-    width: 100%;
-    min-height: 40px;
-    padding: 10px 43px 10px 57px;
-    margin: 0 0 15px 0;
-    color: rgba(255,255,255,0.9);
-    background: $blue;
-    position:relative;
-    box-shadow: $shadow;
-    @include transform(translateZ(0));
-
     @include icon($i-notification) {
         position: absolute;
         top: 0;
@@ -927,6 +964,18 @@ nav {
         color: rgba(255,255,255,0.8);
         background: rgba(0,0,0,0.1);
     };
+    @include box-sizing(border-box);
+    width: 100%;
+    min-height: 40px;
+    padding: 10px 43px 10px 57px;
+    margin: 0 0 15px 0;
+    color: rgba(255,255,255,0.9);
+    background: $blue;
+    position:relative;
+    box-shadow: $shadow;
+    @include transform(translateZ(0));
+
+    @include breakpoint($mobile) {margin-bottom: 1px;}
 
     .close {
         @include icon-after($i-close) {
@@ -1166,14 +1215,11 @@ main {
     right:0;
     z-index: 400;
     height: 40px;
-    padding: 12px 15px;
+    padding: 10px 15px;
     text-transform: uppercase;
-    font-size: 0.85em;
     color: $brown;
     //Transparent gradient to make bg fade out as it goes out the top.
-    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(255,255,255,1)), color-stop(25%,rgba(255,255,255,1)), color-stop(100%,rgba(255,255,255,0.90)));
-    background: -webkit-linear-gradient(top,  rgba(255,255,255,1) 0%,rgba(255,255,255,1) 25%,rgba(255,255,255,0.90) 100%);
-    background: linear-gradient(to bottom,  rgba(255,255,255,1) 0%,rgba(255,255,255,1) 25%,rgba(255,255,255,0.90) 100%);
+    @include linear-gradient(top, white 0%, white 25%, rgba(255,255,255,0.9) 100%, $fallback: transparent);
 
     button, .button {
         display: inline-block;
@@ -1203,6 +1249,10 @@ main {
                 display: inline-block;
             }
         }
+    }
+
+    small {
+        font-size: 0.85em;
     }
 
     a {
@@ -1254,7 +1304,7 @@ main {
     @include baseline;
     position: relative;
     overflow:hidden;
-    padding: 55px 60px 65px 60px;
+    padding: 55px 60px;
     border: $lightbrown 3px dashed;
     width: 100%;
     height: auto;
@@ -1272,23 +1322,17 @@ main {
     }
     .description {
         margin-top: 10px;
-        margin-bottom: -40px;
-    }
-    .centre{
-        position: relative;
-        top: 50px;
-        display: block;
-        margin: 0 auto -6px auto;
     }
     .media {
         @include icon($i-image, 60px, darken($lightbrown, 3%)) {
-            display:inline-block;
+            display: inline-block;
+            vertical-align: initial;
             @include transition(transform 1s ease);
         }
     }
 
-    .image-url {
-        @include icon($i-link, 12px);
+    .image-url,
+    .image-upload {
         line-height: 12px;
         padding: 10px;
         display: block;
@@ -1297,7 +1341,25 @@ main {
         left: 0;
         color: $brown;
         text-decoration: none;
+        @include user-select(none);
+
+        &:hover {
+          cursor: pointer;
+        }
     }
+
+    .image-webcam {
+      @include icon($i-camera, 12px);
+    }
+
+    .image-url {
+      @include icon($i-link, 12px);
+    }
+
+    .image-upload {
+      @include icon($i-image, 12px);
+    }
+
     .button-add {
         display: inline-block;
         position:relative;
@@ -1305,32 +1367,12 @@ main {
         color: #fff;
         padding-left:5px;
     }
-
-    .image-webcam {
-        @include icon($i-camera, 12px);
-        line-height: 12px;
-        padding: 10px;
-        display: block;
-        position: absolute;
-        bottom: 0;
-        right: 0;
-        color: $brown;
-        text-decoration: none;
+    .button-save {
+      margin: 0 0 0 10px;
     }
-    .image-cancel {
-        @include icon($i-x, 16px);
-        position: absolute;
-        color: white;
-        text-shadow: rgba(0,0,0,0.3) 0 0 3px;
-        top: 10px;
-        right: 10px;
-        text-decoration: none;
 
-        &:hover {
-            cursor: pointer;
-            color: white;
-        }
-    }
+
+
     input {
         &.main{
             position: absolute;
@@ -1343,20 +1385,20 @@ main {
             direction: ltr;
             cursor: pointer;
             &.right {
-                position: relative;
                 right: 9999px;
+                height: 0;
             }
         }
+
         &.url{
             font: -webkit-small-control;
             box-sizing: border-box;
             width: 276px;
-            padding: 5px 7px;
-            margin: 0;
-            margin-top: -10px;
-            margin-bottom: -1px; outline: 0;
+            vertical-align: middle;
+            padding: 9px 7px;
+            margin: 10px 0;
+            outline: 0;
             font-size: 1.1em;
-            line-height: 1.4em;
             background: #fff;
             border: #e3e1d5 1px solid;
             border-radius: 4px;
@@ -1364,11 +1406,10 @@ main {
             -moz-transition: all 0.15s ease-in-out;
         }
     }
+
     .progress {
         position: relative;
-        top: -22px;
-        margin:  auto;
-        margin-bottom: -12px;
+        margin: -19px 0 44px 0;
         display: block;
         overflow: hidden;
         @include linear-gradient(to bottom, #f5f5f5, #f9f9f9);
@@ -1390,6 +1431,7 @@ main {
         top: -40px;
         font-size: 16px;
     }
+
     .bar {
         height: 12px;
         background: $blue;
@@ -1398,6 +1440,7 @@ main {
             background: $red;
         }
     }
+
 }
 
 .pre-image-uploader {
@@ -1440,20 +1483,23 @@ main {
         top: 10px;
         right: 10px;
         padding: 8px;
-        background: rgba(0,0,0,0.3);
-        border-radius: $rounded;
-        color: white;
+        z-index: 300;
+        color: #fff;
         text-decoration: none;
         line-height: 0;
+        border-radius: $rounded;
+        background: rgba(0,0,0,0.6);
+        box-shadow: rgba(255,255,255,0.2) 0 0 0 1px;
 
         &:hover {
-            background: rgba(0,0,0,0.5);
+            color: #fff;
             cursor: pointer;
-            color: white;
+            background: $red;
         }
     }
 
 }//.pre-image-uploader
+
 
 /* ==========================================================================
    NProgress
@@ -1632,11 +1678,3 @@ main {
     }
 
 }
-
-.status-draft {
-    color: $red;
-}
-.status-scheduled {
-    color: $orange;
-}
-

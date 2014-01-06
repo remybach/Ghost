@@ -1,5 +1,5 @@
 /*
- * These styles control elements specific to the mage posts screen
+ * These styles control elements specific to the manage posts screen
  * used for previewing and reading existing content in Ghost.
  *
  * Table of Contents:
@@ -95,14 +95,22 @@
             }
         }
 
-        .featured .date {
+        .featured .status {
             @include icon($i-featured, 11px) {
-                margin-right:12px;
-                vertical-align: 0;
+                margin-right: 10px;
+                vertical-align: 7%;
             };
         }
 
-        ol {
+        .status .draft {
+            color: $red;
+        }
+        .status .scheduled {
+            color: $orange;
+        }
+
+
+      ol {
             list-style: none;
             padding:0;
             margin:0;
@@ -229,12 +237,12 @@
         .post-controls {
             float:right;
             position: relative;
+        }
 
-            ul {
-                position: absolute;
-                top:15px;
-                right:-10px;
-            }
+        .post-settings-menu {
+            position: absolute;
+            top: 35px;
+            right: -3px;
         }
 
         .post-edit {
@@ -250,4 +258,34 @@
 
     }//.preview-post
 
+    .no-posts-box {
+        position: relative;
+        height: 90%;
+        margin: 0px auto;
+        padding: 0px;
+        display: table;
+        z-index: 600;
+        @include breakpoint($tablet) {
+            position: fixed;
+            top: 45%;
+            left: 50%;
+        }
+
+        .no-posts {
+            vertical-align: middle;
+            display: table-cell;
+            text-align: center;
+            @include breakpoint($tablet) {
+                display: block;
+                position: relative;
+                left: -50%;
+            }
+
+            h3 {
+                color: $brown;
+                font-weight: 200;
+                font-size: 2em;
+            }
+        }
+    }//.no-posts-box
 }//.manage

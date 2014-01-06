@@ -1,5 +1,5 @@
 /*globals describe, before, beforeEach, afterEach, it*/
-var testUtils = require('./testUtils'),
+var testUtils = require('../utils'),
     should = require('should'),
     sinon = require('sinon'),
     when = require('when'),
@@ -16,17 +16,14 @@ var testUtils = require('./testUtils'),
 describe('Permissions', function () {
 
     before(function (done) {
-        testUtils.clearData()
-            .then(function () {
+        testUtils.clearData().then(function () {
                 done();
             }, done);
     });
 
     beforeEach(function (done) {
-        this.timeout(5000);
         testUtils.initData()
-            .then(testUtils.insertDefaultUser)
-            .then(function () {
+            .then(testUtils.insertDefaultUser).then(function () {
                 done();
             }, done);
     });
@@ -36,6 +33,12 @@ describe('Permissions', function () {
             .then(function () {
                 done();
             }, done);
+    });
+
+    after(function (done) {
+        testUtils.clearData().then(function () {
+            done();
+        }, done);
     });
 
     var testPerms = [

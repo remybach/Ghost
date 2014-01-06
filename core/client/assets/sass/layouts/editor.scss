@@ -2,7 +2,7 @@
  * These styles control elements specific to the post editor screen
  * used for publishing content with Ghost.
  *
- * Table of Contents: 
+ * Table of Contents:
  *
  * Editor / Preview
  * Post Preview Content
@@ -17,6 +17,12 @@
    ============================================================================= */
 
 .editor {
+
+    #notifications {
+        @include breakpoint($biggerthan-mobile) {
+            bottom: 40px;
+        }
+    }
 
     // The main post title
     .entry-title {
@@ -402,6 +408,19 @@ body.zen {
 
     @include breakpoint($netbook) {font-weight: normal;}
 
+    .post-settings {
+        &:hover,
+        &.active {
+            color: $lightgrey;
+        }
+    }
+
+    .post-settings-menu {
+        position: absolute;
+        bottom: 44px;
+        right: -3px;
+    }
+
     button {
         min-height: 30px;
         height: 30px;
@@ -444,7 +463,7 @@ body.zen {
 .extended-tags { // When the tag bar is exapanded
     position: static;
     min-height: 100%;
-    
+
     #entry-tags {
         &:after {
             right: 10px;
@@ -501,87 +520,89 @@ body.zen {
         left: 29px;
         @include linear-gradient(right, rgba(26, 28, 29, 0.00), rgba(26, 28, 29, 1.00));
     }
-}
 
-.tags {
-    position: relative;
-    display: inline-block;
-    vertical-align: middle;
-    width: auto;
-    max-width: 80%;
-    max-width: calc(100% - 320px);
-    height: 26px;
-    padding-left: 20px;
-    padding-bottom: 20px;
-    overflow-x: auto;
-    overflow-y: hidden;
-    -webkit-overflow-scrolling: touch;
-    white-space: nowrap;
-    @include transition(width 0.2s linear);
+    .tags {
+        position: relative;
+        display: inline-block;
+        vertical-align: middle;
+        width: auto;
+        max-width: 80%;
+        max-width: calc(100% - 320px);
+        height: 26px;
+        padding-left: 8px;
+        padding-bottom: 20px;
+        overflow-x: auto;
+        overflow-y: hidden;
+        -webkit-overflow-scrolling: touch;
+        white-space: nowrap;
+        @include transition(width 0.2s linear);
 
-    @include breakpoint($mobile) {
-        @include box-sizing(border-box);
+        @include breakpoint($mobile) {
+            @include box-sizing(border-box);
+            display: block;
+            width: 115px;
+            max-width: inherit;
+            padding-bottom: 0;
+        }
+    }
+
+    .tag-label {
         display: block;
-        width: 115px;
-        max-width: inherit;
-        padding-bottom: 0;
-    }
-}
-
-.tag-label {
-    display: block;
-    float: left;
-    @include icon($i-tag);
-    padding: 1px 8px 0 8px;
-    @include transition;
-
-    &:hover {
-        cursor: pointer;
-        color: $lightgrey;
-    }
-
-    &.touch {
-        color: inherit;
-    }
-}
-
-.tag-input {
-    display: inline-block;
-    vertical-align: top;
-    color: $lightgrey;
-    font-weight: 300;
-    background: transparent;
-    border: none;
-
-    &:focus {outline: none;}
-}
-
-.tag {
-    @include icon-after($i-x, 8px, $darkgrey) {
-        margin-left: 4px;
-        vertical-align: 5%;
-        text-shadow: rgba(255,255,255,0.15) 0 1px 0;
+        float: left;
+        @include icon($i-tag);
+        padding: 1px 8px 0 8px;
         @include transition;
-    }
-    display: inline;
-    margin-right: 5px;
-    padding: 0 5px;
-    color: $lightgrey;
-    white-space: nowrap;
-    background: lighten($grey, 15%);
-    border-radius: $rounded;
-    box-shadow: 
-        rgba(255,255,255,0.2) 0 1px 0 inset,
-        #000 0 1px 3px;
 
-    @include user-select(none);
+        &:hover {
+            cursor: pointer;
+            color: $lightgrey;
+        }
 
-    &:hover {
-        cursor: pointer;
-        @include icon-after($i-x, 8px, $lightgrey) {text-shadow: none;}
-
+        &.touch {
+            color: inherit;
+        }
     }
 
+    input[type="text"].tag-input {
+        display: inline-block;
+        padding: 0;
+        vertical-align: top;
+        color: $lightgrey;
+        font-weight: 300;
+        background: transparent;
+        border: none;
+
+        &:focus {
+            outline: none;
+        }
+    }
+
+    .tag {
+        @include icon-after($i-x, 8px, $darkgrey) {
+            margin-left: 4px;
+            vertical-align: 5%;
+            text-shadow: rgba(255,255,255,0.15) 0 1px 0;
+            @include transition;
+        }
+        display: inline;
+        margin-right: 5px;
+        padding: 0 5px;
+        color: $lightgrey;
+        white-space: nowrap;
+        background: lighten($grey, 15%);
+        border-radius: $rounded;
+        box-shadow:
+            rgba(255,255,255,0.2) 0 1px 0 inset,
+            #000 0 1px 3px;
+
+        @include user-select(none);
+
+        &:hover {
+            cursor: pointer;
+            @include icon-after($i-x, 8px, $lightgrey) {text-shadow: none;}
+
+        }
+    }
 }
 
 .suggestions {
@@ -590,7 +611,7 @@ body.zen {
 
   li.selected{
     background: $blue;
-    box-shadow: 
+    box-shadow:
         rgba(255,255,255,0.2) 0 1px 0 inset,
         rgba(0,0,0,0.5) 0 1px 5px;
   }
@@ -615,45 +636,6 @@ body.zen {
     z-index: 1;
 }
 
-.entry-settings {
-    @include icon($i-settings, 14px);
-    @include box-sizing(border-box);
-    display: inline-block;
-    padding: 0 10px;
-    color: $midgrey;
-    @include transition;
-    position: relative;
-    top: 1px;
-
-    &:hover,
-    &.active {
-        color: $lightgrey;
-    }
-}
-
-.entry-settings-menu {
-    position: absolute;
-    bottom: 44px;
-    right: -3px;
-
-    li {
-        a {
-            padding: 10px 15px;
-
-            &:before {
-                font-size: 11px;
-                line-height: 1em;
-            }
-        }
-    }
-
-    .delete {
-        @include icon($i-trash) { position: relative; top: -2px; };
-
-        &:hover { background: $red; }
-    }
-}
-
 #entry-actions {
     margin-right: 6px;
     position: relative;
@@ -668,12 +650,15 @@ body.zen {
 /* =============================================================================
    Markdown Help Modal
    ============================================================================= */
+
 .markdown-help-container{
     padding-bottom: 20px;
 }
+
 .modal-markdown-help-table {
     margin-top: 0;
 }
+
 
 /* =============================================================================
    CodeMirror

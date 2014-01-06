@@ -2,7 +2,7 @@
 (function () {
     'use strict';
 
-    Ghost.Collections.Tags = Ghost.TemplateModel.extend({
-        url: Ghost.settings.apiRoot + '/tags/'
+    Ghost.Collections.Tags = Ghost.ProgressCollection.extend({
+        url: Ghost.paths.apiRoot + '/tags/'
     });
 }());

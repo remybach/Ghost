@@ -6,7 +6,7 @@
  */
 
 /*globals describe, it */
-var testUtils = require('./testUtils'),
+var testUtils = require('../utils'),
     should = require('should'),
 
     // Stuff we are testing
@@ -17,15 +17,15 @@ describe("Ghostdown showdown extensions", function () {
 
     it("should export an array of methods for processing", function () {
 
-        ghostdown.should.be.a("function");
+        ghostdown.should.be.a.function;
         ghostdown().should.be.an.instanceof(Array);
 
         ghostdown().forEach(function (processor) {
-            processor.should.be.a("object");
+            processor.should.be.an.Object;
             processor.should.have.property("type");
             processor.should.have.property("filter");
-            processor.type.should.be.a("string");
-            processor.filter.should.be.a("function");
+            processor.type.should.be.a.String;
+            processor.filter.should.be.a.function;
         });
     });
 
@@ -38,11 +38,11 @@ describe("Ghostdown showdown extensions", function () {
             "![image and another,/ image](http://dsurl.stuff)",
             "![](http://dsurl.stuff)"
             /* No ref-style for now
-            "![][]",
-            "![image and another,/ image][stuff]",
-            "![][stuff]",
-            "![image and another,/ image][]"
-            */
+             "![][]",
+             "![image and another,/ image][stuff]",
+             "![][stuff]",
+             "![image and another,/ image][]"
+             */
         ]
             .forEach(function (imageMarkup) {
                 var processedMarkup =
@@ -55,14 +55,23 @@ describe("Ghostdown showdown extensions", function () {
             });
     });
 
+    it("should allow 4 underscores", function () {
+        var processedMarkup =
+            ghostdown().reduce(function (prev, processor) {
+                return processor.filter(prev);
+            }, "Ghost ____");
+
+        processedMarkup.should.match(/Ghost\s(?:&#95;){4}$/);
+    });
+
     it("should correctly include an image", function () {
         [
             "![image and another,/ image](http://dsurl.stuff)",
             "![](http://dsurl.stuff)"
             /* No ref-style for now
-            "![image and another,/ image][test]\n\n[test]: http://dsurl.stuff",
-            "![][test]\n\n[test]: http://dsurl.stuff"
-            */
+             "![image and another,/ image][test]\n\n[test]: http://dsurl.stuff",
+             "![][test]\n\n[test]: http://dsurl.stuff"
+             */
         ]
             .forEach(function (imageMarkup) {
                 var processedMarkup =
